@@ -5,7 +5,6 @@ import {
 	IAppState,
 	PaymentMethod,
 	FormErrors,
-	IOrderForm,
 	IContactInfoForm,
 } from '../types/index.ts';
 import { EventEmitter } from './base/events.ts';
@@ -44,7 +43,9 @@ export class AppState extends Model<IAppState> {
 
 	addToOrder(product: IProduct): void {
 		if (this.order) {
-			this.order.items.push(product);
+            if (!this.order.items.some((_product) => _product.id === product.id)) {
+			    this.order.items.push(product);
+            }
 		} else {
 			this.order = {
 				payment: PaymentMethod.Online,
