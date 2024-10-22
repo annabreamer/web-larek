@@ -4,34 +4,41 @@ export interface IProduct {
 	title: string;
 	image: string;
 	category: string;
-    price: number | null;
+	price: number | null;
 }
 
-// export interface IProductData {
-// 	items: IProduct[];
-// 	preview: string | null;
-// }
-
 export interface IAppState {
-    catalog: IProduct[];
-    preview: string | null;
-    order: IOrder | null;
+	catalog: IProduct[];
+	preview: string | null;
+	order: IOrder | null;
+	getProduct(productId: string): void;
+	setCatalog(items: IProduct[]): void;
+	addToOrder(product: IProduct): void;
+	removeFromOrder(productId: string): void;
+	clearOrder(): void;
+	setPreview(product: IProduct): void;
+	setOrderField(field: keyof IContactInfoForm | 'address', value: string): void;
+	setPaymentMethod(value: PaymentMethod): void;
+	validateOrder(): void;
+}
+
+export enum PaymentMethod {
+	Online = 'Онлайн',
+	OnDelivery = 'При получении',
 }
 
 export interface IOrderForm {
-    payment: string;
-    address: string;
+	payment: PaymentMethod;
+	address: string;
 }
 
 export interface IContactInfoForm {
-    email: string;
-    phone: string;
+	email: string;
+	phone: string;
 }
 
 export interface IOrder extends IOrderForm, IContactInfoForm {
-    items: IProduct[]
+	items: IProduct[];
 }
 
-
-
-
+export type FormErrors = Partial<Record<keyof IOrder, string>>;
