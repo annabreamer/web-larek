@@ -47,7 +47,7 @@ export class AppState extends Model<IAppState> {
 			this.order.items.push(product);
 		} else {
 			this.order = {
-				payment: PaymentMethod.OnDelivery,
+				payment: PaymentMethod.Online,
 				address: '',
 				email: '',
 				phone: '',
