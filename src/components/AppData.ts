@@ -1,4 +1,4 @@
-import { Model } from './base/Model.ts';
+import { Model } from './base/Model';
 import {
 	IProduct,
 	IOrder,
@@ -6,8 +6,12 @@ import {
 	PaymentMethod,
 	FormErrors,
 	IContactInfoForm,
-} from '../types/index.ts';
-import { EventEmitter } from './base/events.ts';
+} from '../types/index';
+import { EventEmitter } from './base/events';
+
+export type CatalogChangeEvent = {
+	catalog: ProductItem[];
+};
 
 export class ProductItem extends Model<IProduct> {
 	id: string;
@@ -41,11 +45,18 @@ export class AppState extends Model<IAppState> {
 		this.emitChanges('items:changed', { catalog: this.catalog });
 	}
 
+	getItemsCount(): number {
+		if (this.order) {
+			return this.order.items.length;
+		}
+		return 0;
+	}
+
 	addToOrder(product: IProduct): void {
 		if (this.order) {
-            if (!this.order.items.some((_product) => _product.id === product.id)) {
-			    this.order.items.push(product);
-            }
+			if (!this.order.items.some((_product) => _product.id === product.id)) {
+				this.order.items.push(product);
+			}
 		} else {
 			this.order = {
 				payment: PaymentMethod.Online,
@@ -54,8 +65,9 @@ export class AppState extends Model<IAppState> {
 				phone: '',
 				items: [product],
 			};
+			this.events.emit('order:updated', this.order);
 		}
-		this.events.emit('order:updated', this.order);
+		this.events.emit('basket:changed', this.order);
 	}
 
 	removeFromOrder(productId: string): void {
@@ -66,7 +78,7 @@ export class AppState extends Model<IAppState> {
 			if (this.order.items.length === 0) {
 				this.clearOrder();
 			}
-			this.events.emit('order:updated', this.order);
+			this.events.emit('basket:changed', this.order);
 		}
 	}
 

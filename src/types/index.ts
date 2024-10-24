@@ -13,6 +13,7 @@ export interface IAppState {
 	order: IOrder | null;
 	getProduct(productId: string): void;
 	setCatalog(items: IProduct[]): void;
+	getItemsCount(): number;
 	addToOrder(product: IProduct): void;
 	removeFromOrder(productId: string): void;
 	clearOrder(): void;

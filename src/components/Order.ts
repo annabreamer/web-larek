@@ -23,11 +23,13 @@ export class Order extends Form<IContactInfoForm & IOrderForm> {
 	}
 
 	set payment(value: PaymentMethod) {
-		const paymentRadio = this.container.querySelector<HTMLInputElement>(
-			`input[name="payment"][value="${value}"]`
-		);
-		if (paymentRadio) {
-			paymentRadio.checked = true;
-		}
+		const paymentButtons =
+			this.container.querySelectorAll<HTMLButtonElement>('.button_alt');
+		paymentButtons.forEach((button) => {
+			button.classList.remove('button_alt-active');
+			if (button.innerText === value) {
+				button.classList.add('button_alt-active');
+			}
+		});
 	}
 }
