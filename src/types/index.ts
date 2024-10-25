@@ -24,8 +24,8 @@ export interface IAppState {
 }
 
 export enum PaymentMethod {
-	Online = 'Онлайн',
-	OnDelivery = 'При получении',
+	card = 'card',
+	cash = 'cash',
 }
 
 export interface IOrderForm {

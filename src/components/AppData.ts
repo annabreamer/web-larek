@@ -59,7 +59,7 @@ export class AppState extends Model<IAppState> {
 			}
 		} else {
 			this.order = {
-				payment: PaymentMethod.Online,
+				payment: PaymentMethod.card,
 				address: '',
 				email: '',
 				phone: '',
@@ -84,7 +84,7 @@ export class AppState extends Model<IAppState> {
 
 	clearOrder(): void {
 		this.order = null;
-		this.events.emit('order:cleared');
+		this.events.emit('basket:changed');
 	}
 
 	setPreview(product: IProduct): void {

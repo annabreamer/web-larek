@@ -8,7 +8,7 @@ import { BasketItem, CatalogItem, ProductCard } from './components/Card';
 import { Basket } from './components/common/Basket';
 import { Modal } from './components/common/Modal';
 import { Success } from './components/common/Success';
-import { Order } from './components/Order';
+import { Contacts, Order } from './components/Order';
 import { Page } from './components/Page';
 import { ProductAPI } from './components/ProductApi';
 import './scss/styles.scss';
@@ -43,7 +43,7 @@ const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 // Переиспользуемые части интерфейса
 const basket = new Basket(cloneTemplate(basketTemplate), events);
 const order = new Order(cloneTemplate(orderTemplate), events);
-const contacts = new Order(cloneTemplate(contactsTemplate), events);
+const contacts = new Contacts(cloneTemplate(contactsTemplate), events);
 
 // Дальше идет бизнес-логика
 // Поймали событие, сделали что нужно
@@ -67,7 +67,7 @@ events.on<CatalogChangeEvent>('items:changed', () => {
 });
 
 // Отправлена форма заказа
-events.on('order:submit', () => {
+events.on('contacts:submit', () => {
 	api
 		.orderProducts(appData.order)
 		.then((result) => {
@@ -77,10 +77,14 @@ events.on('order:submit', () => {
 					appData.clearOrder();
 				},
 			});
+			success.total = appData.order.items
+				.map((item) => item.price)
+				.reduce((sum, i) => sum + i, 0);
 
 			modal.render({
 				content: success.render({}),
 			});
+			appData.clearOrder();
 		})
 		.catch((err) => {
 			console.error(err);
@@ -90,8 +94,8 @@ events.on('order:submit', () => {
 // Изменилось состояние валидации формы
 events.on('formErrors:change', (errors: Partial<IContactInfoForm>) => {
 	const { email, phone } = errors;
-	order.valid = !email && !phone;
-	order.errors = Object.values({ phone, email })
+	contacts.valid = !email && !phone;
+	contacts.errors = Object.values({ phone, email })
 		.filter((i) => !!i)
 		.join('; ');
 });
@@ -106,8 +110,15 @@ events.on('formErrors:change', (errors: Partial<IOrderForm>) => {
 
 // Изменилось одно из полей
 events.on(
-	/^order\..*:change/,
-	(data: { field: keyof IContactInfoForm | 'address'; value: string }) => {
+	/^contacts\..*:change/,
+	(data: { field: keyof IContactInfoForm; value: string }) => {
+		appData.setOrderField(data.field, data.value);
+	}
+);
+
+events.on(
+	'order.address:change',
+	(data: { field: 'address'; value: string }) => {
 		appData.setOrderField(data.field, data.value);
 	}
 );
@@ -115,11 +126,11 @@ events.on(
 events.on(
 	'order.payment:change',
 	(data: { field: 'payment'; value: string }) => {
-		if (data.value === PaymentMethod.Online) {
-			appData.setPaymentMethod(PaymentMethod.Online);
+		if (data.value === PaymentMethod.card) {
+			appData.setPaymentMethod(PaymentMethod.card);
 		}
-		if (data.value === PaymentMethod.OnDelivery) {
-			appData.setPaymentMethod(PaymentMethod.OnDelivery);
+		if (data.value === PaymentMethod.cash) {
+			appData.setPaymentMethod(PaymentMethod.cash);
 		}
 	}
 );
@@ -135,12 +146,17 @@ events.on('basket:open', () => {
 events.on('order:open', () => {
 	modal.render({
 		content: order.render({
-			payment: PaymentMethod.Online,
+			payment: PaymentMethod.card,
 			address: '',
 			valid: false,
 			errors: [],
 		}),
 	});
+});
+
+// Переключиться на форму контактной информации
+events.on('order:submit', () => {
+	events.emit('contacts:open');
 });
 
 // Открыть форму контактной информации

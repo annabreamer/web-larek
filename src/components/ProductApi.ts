@@ -32,6 +32,15 @@ export class ProductAPI extends Api implements IProductAPI {
 	}
 
 	orderProducts(order: IOrder): Promise<IOrder> {
-		return this.post('/order', order).then((data: object) => data as IOrder);
+		return this.post('/order', {
+			payment: order.payment,
+			email: order.email,
+			phone: order.phone,
+			address: order.address,
+			total: order.items
+				.map((item) => item.price)
+				.reduce((sum, i) => sum + i, 0),
+			items: order.items.map((item) => item.id),
+		}).then((data: object) => data as IOrder);
 	}
 }

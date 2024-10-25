@@ -38,18 +38,12 @@ export class Basket extends Component<IBasketView> {
 					textContent: 'Корзина пуста',
 				})
 			);
-		}
-	}
-
-	set selected(items: string[]) {
-		if (items.length) {
-			this.setDisabled(this._button, false);
-		} else {
 			this.setDisabled(this._button, true);
 		}
 	}
 
 	set total(total: number) {
 		this.setText(this._total, `${total} синапсов`);
+		this.setDisabled(this._button, total === 0);
 	}
 }
