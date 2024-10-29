@@ -66,7 +66,7 @@ events.on<CatalogChangeEvent>('items:changed', () => {
 	page.counter = appData.getItemsCount();
 });
 
-// Отправлена форма заказа
+// Отправлена форма контактной информации
 events.on('contacts:submit', () => {
 	api
 		.orderProducts(appData.order)

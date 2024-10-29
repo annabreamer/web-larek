@@ -19,7 +19,7 @@ export class Order extends Form<IOrderForm> {
 		);
 
 		this.buttonCard.addEventListener('click', () => {
-			this.onInputChange('payment', 'card'); // Изменение метода оплаты
+			this.onInputChange('payment', 'card'); 
 			this.payment = PaymentMethod.card;
 		});
 
@@ -29,9 +29,7 @@ export class Order extends Form<IOrderForm> {
 		});
 	}
 
-	// Сеттер для управления выбором кнопки оплаты
 	set payment(value: PaymentMethod) {
-		// Сбрасываем активный класс у обеих кнопок
 		this.buttonCash.classList.toggle(
 			'button_alt-active',
 			this.buttonCash.name === value
@@ -42,7 +40,6 @@ export class Order extends Form<IOrderForm> {
 		);
 	}
 
-	// Метод для отключения кнопок оплаты, если нужно
 	disableButtons() {
 		this.buttonCash.disabled = true;
 		this.buttonCard.disabled = true;
