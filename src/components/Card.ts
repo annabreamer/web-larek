@@ -1,16 +1,9 @@
+import { IProduct } from '../types';
 import { ensureElement } from '../utils/utils';
 import { Component } from './base/Components';
 
 interface IProductCardActions {
 	onClick: (event: MouseEvent) => void;
-}
-
-export interface IProduct {
-	title: string;
-	description?: string;
-	image: string;
-	category: string;
-	price: number | null;
 }
 
 export class CardView extends Component<IProduct> {
@@ -42,16 +35,8 @@ export class CardView extends Component<IProduct> {
 		this.container.dataset.id = value;
 	}
 
-	get id(): string {
-		return this.container.dataset.id || '';
-	}
-
 	set title(value: string) {
 		this.setText(this._title, value);
-	}
-
-	get title(): string {
-		return this._title.textContent || '';
 	}
 
 	set price(value: number | null) {
@@ -83,19 +68,50 @@ export class CatalogItem extends CardView {
 
 	set category(value: string) {
 		this.setText(this._category, value);
+		switch (value) {
+			case 'софт-скил':
+				this._category.style.backgroundColor = '#83FA9D';
+				break;
+			case 'другое':
+				this._category.style.backgroundColor = '#FAD883';
+				break;
+			case 'дополнительное':
+				this._category.style.backgroundColor = '#B783FA';
+				break;
+			case 'кнопка':
+				this._category.style.backgroundColor = '#83DDFA';
+				break;
+			case 'хард-скил':
+				this._category.style.backgroundColor = '#FAA083';
+				break;
+			default:
+				this._category.style.backgroundColor = '#83FA9D';
+		}
 	}
 }
 
 export class ProductCard extends CatalogItem {
+	buttonAddToCart: HTMLButtonElement;
 	protected _description?: HTMLElement;
 
 	constructor(container: HTMLElement, actions?: IProductCardActions) {
 		super(container, actions);
 		this._description = container.querySelector(`.${this.blockName}__text`);
+		this.buttonAddToCart = container.querySelector('.card__button');
+
+		if (this.buttonAddToCart && actions?.onClick) {
+			this.buttonAddToCart.addEventListener('click', actions.onClick);
+		}
 	}
 
 	set description(value: string) {
 		this.setText(this._description, value);
+	}
+
+	disableAddButton(disable: boolean) {
+		if (this.buttonAddToCart) {
+			this.buttonAddToCart.disabled = disable;
+		}
 	}
 }
 

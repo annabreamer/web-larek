@@ -10,17 +10,8 @@ import {
 import { EventEmitter } from './base/events';
 
 export type CatalogChangeEvent = {
-	catalog: ProductItem[];
+	catalog: IProduct[];
 };
-
-export class ProductItem extends Model<IProduct> {
-	id: string;
-	description?: string;
-	title: string;
-	image: string;
-	category: string;
-	price: number | null;
-}
 
 export class AppState extends Model<IAppState> {
 	catalog: IProduct[];
@@ -41,13 +32,22 @@ export class AppState extends Model<IAppState> {
 	}
 
 	setCatalog(items: IProduct[]) {
-		this.catalog = items.map((item) => new ProductItem(item, this.events));
+		this.catalog = items;
 		this.emitChanges('items:changed', { catalog: this.catalog });
 	}
 
 	getItemsCount(): number {
 		if (this.order) {
 			return this.order.items.length;
+		}
+		return 0;
+	}
+
+	getItemsTotal(): number {
+		if (this.order) {
+			return this.order.items
+				.map((item) => item.price)
+				.reduce((sum, i) => sum + i, 0);
 		}
 		return 0;
 	}
@@ -95,17 +95,13 @@ export class AppState extends Model<IAppState> {
 	setOrderField(field: keyof IContactInfoForm | 'address', value: string) {
 		if (this.order) {
 			this.order[field] = value;
-
-			if (this.validateOrder()) {
-				this.events.emit('order:ready', this.order);
-			}
+			this.validateOrder();
 		}
 	}
 
 	setPaymentMethod(value: PaymentMethod) {
 		if (this.order) {
 			this.order.payment = value;
-			this.events.emit('order:ready', this.order);
 		}
 	}
 

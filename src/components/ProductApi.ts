@@ -1,10 +1,20 @@
-import { IOrder, IProduct } from '../types';
+import { IContactInfoForm, IOrderForm, IProduct } from '../types';
 import { Api, ApiListResponse } from './base/api';
+
+interface IOrderRequest extends IOrderForm, IContactInfoForm {
+	total: number;
+	items: string[];
+}
+
+interface IOrderResult {
+	id: string;
+	total: number;
+}
 
 export interface IProductAPI {
 	getProductList: () => Promise<IProduct[]>;
 	getProductItem: (id: string) => Promise<IProduct>;
-	orderProducts: (order: IOrder) => Promise<IOrder>;
+	orderProducts: (order: IOrderRequest) => Promise<IOrderResult>;
 }
 
 export class ProductAPI extends Api implements IProductAPI {
@@ -31,16 +41,7 @@ export class ProductAPI extends Api implements IProductAPI {
 		);
 	}
 
-	orderProducts(order: IOrder): Promise<IOrder> {
-		return this.post('/order', {
-			payment: order.payment,
-			email: order.email,
-			phone: order.phone,
-			address: order.address,
-			total: order.items
-				.map((item) => item.price)
-				.reduce((sum, i) => sum + i, 0),
-			items: order.items.map((item) => item.id),
-		}).then((data: object) => data as IOrder);
+	orderProducts(order: IOrderRequest): Promise<IOrderResult> {
+		return this.post('/order', order).then((data: object) => data as IOrderResult);
 	}
 }

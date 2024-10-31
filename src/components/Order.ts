@@ -19,13 +19,11 @@ export class Order extends Form<IOrderForm> {
 		);
 
 		this.buttonCard.addEventListener('click', () => {
-			this.onInputChange('payment', 'card'); 
-			this.payment = PaymentMethod.card;
+			this.onInputChange('payment', 'card');
 		});
 
 		this.buttonCash.addEventListener('click', () => {
 			this.onInputChange('payment', 'cash');
-			this.payment = PaymentMethod.cash;
 		});
 	}
 
